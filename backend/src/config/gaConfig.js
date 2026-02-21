@@ -1,0 +1,31 @@
+const gaConfig = {
+  NUM_DAYS: 7,
+  SLOTS_PER_DAY: 48,
+  get TOTAL_SLOTS() {
+    return this.NUM_DAYS * this.SLOTS_PER_DAY;
+  },
+  ALLELES: {
+    REST: 0,
+    WORK: 1,
+    STUDY_FIXED: 2,
+    NAP: 3
+  },
+  POP_SIZE: 100,
+  TOURNAMENT_SIZE: 5,
+  ELITE_COUNT: 2,
+  CROSSOVER_RATE: 0.8,
+  MUTATION_RATE: 0.2,
+  MAX_GENERATIONS: 200,
+  STUDY_PENALTY_PER_VIOLATION: 1000000,
+  SLEEP_PENALTY_PER_SLOT_SHORT: 1000,
+  MIN_SLEEP_SLOTS_PER_DAY: 12,
+  TAU_R: 18,
+  TAU_D: 4,
+  DT_HOURS: 0.5,
+  S_MAX: 1,
+  S_INITIAL: 0.3,
+  C_AMPLITUDE: 1,
+  C_PHASE: 0
+};
+
+module.exports = gaConfig;

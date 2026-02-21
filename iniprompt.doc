@@ -1,0 +1,145 @@
+Anda adalah asisten pemrograman ahli JavaScript/TypeScript yang akan membuat project fullstack untuk optimasi jadwal 7 hari menggunakan Genetic Algorithm (GA).
+Stack yang harus digunakan:
+
+Frontend: React (lebih disukai dengan Vite atau Create React App, bebas Anda pilih yang lebih sederhana).
+Backend: Node.js + Express (atau framework HTTP minimal setara), dengan modul GA terpisah.
+1. Struktur Folder yang Harus Dibuat
+Buat struktur direktori berikut (anggap root project bernama schedule-ga-app atau gunakan root workspace saat ini):
+
+schedule-ga-app/
+backend/
+package.json
+src/
+server.js (entry point Express)
+routes/
+gaRoutes.js (endpoint untuk menjalankan GA)
+services/
+gaScheduler.js (implementasi Genetic Algorithm jadwal 7 hari)
+tpmModel.js (Two-Process Model: Process S & Process C)
+config/
+gaConfig.js (konstanta dan parameter GA & TPM)
+frontend/
+package.json
+src/
+main.jsx atau index.jsx (entry React)
+App.jsx
+components/
+GaConfigForm.jsx (form untuk mengatur parameter GA)
+ScheduleViewer.jsx (tampilan jadwal terbaik)
+services/
+apiClient.js (helper untuk memanggil backend /api/ga/...)
+Jika tool Anda mendukung, langsung buat folder dan file di atas dengan isi kodenya, bukan hanya daftar kosong.
+
+2. Backend Node.js – Spesifikasi
+Konfigurasi & Konstanta GA/TPM – file backend/src/config/gaConfig.js
+
+Definisikan semua konstanta penting sebagai objek konfigurasi yang mudah diubah:
+Struktur waktu: NUM_DAYS = 7, SLOTS_PER_DAY = 48, TOTAL_SLOTS = NUM_DAYS * SLOTS_PER_DAY.
+Mapping alel: REST = 0, WORK = 1, STUDY_FIXED = 2, NAP = 3.
+Parameter GA: POP_SIZE = 100, TOURNAMENT_SIZE = 5, ELITE_COUNT = 2, CROSSOVER_RATE, MUTATION_RATE, MAX_GENERATIONS (buat default, tapi mudah diubah).
+Penalti: STUDY_PENALTY_PER_VIOLATION, SLEEP_PENALTY_PER_SLOT_SHORT, MIN_SLEEP_SLOTS_PER_DAY.
+Parameter Two-Process Model: TAU_R, TAU_D, DT_HOURS, S_MAX, S_INITIAL, C_AMPLITUDE, C_PHASE.
+Ekspor objek konfigurasi (CommonJS atau ES module, pilih salah satu dan konsisten).
+Model Two-Process (TPM) – file backend/src/services/tpmModel.js
+
+Implementasikan fungsi:
+computeProcessS(chromosome, config) → array S_values.
+computeProcessC(config) → array C_values (memoized/global cache).
+computeBaseFatigue(chromosome, S_values, C_values) → nilai baseFatigue.
+Gunakan rumus diskrit eksponensial naik/turun untuk Process S dan sinus 24 jam untuk Process C, sesuai deskripsi di config.
+Jaga kode tetap modular dan mudah diuji.
+Layanan GA Jadwal – file backend/src/services/gaScheduler.js
+
+Implementasikan:
+Representasi individu: objek { chromosome: number[], fitness: number }.
+Helper indeks waktu (index ↔ day/slotInDay) dan helper random (randomInt, shuffleArray).
+Fungsi penalti:
+computeStudyFixedPenalty(chromosome, fixedStudyIndices, config)
+computeDailySleepPenalty(chromosome, config)
+Fungsi calculateFitness(chromosome, fixedStudyIndices, config) yang menggabungkan:
+Process S & C (panggil fungsi dari tpmModel.js).
+baseFatigue + penalti studi tetap + penalti kurang tidur.
+Fungsi inisialisasi populasi:
+generateInitialPopulation(popSize, fixedStudyIndices, config)
+Seleksi turnamen:
+tournamentSelection(population, config)
+Crossover PMX yang memperbaiki indeks studi tetap:
+pmxCrossover(parent1, parent2, fixedStudyIndices, config)
+Mutasi swap menghindari indeks studi tetap:
+swapMutation(chromosome, mutationRate, fixedStudyIndices, config)
+Loop utama GA:
+runGeneticAlgorithm(options)
+options boleh berisi override maxGenerations, fixedStudyIndices, dan parameter GA lain.
+Mengembalikan individu terbaik dan statistik (misalnya riwayat fitness terbaik per generasi).
+Ekspor fungsi-fungsi publik minimal:
+runGeneticAlgorithm
+calculateFitness
+Routing & Server
+
+backend/src/routes/gaRoutes.js:
+Buat router Express dengan minimal endpoint:
+POST /api/ga/run
+Body JSON berisi parameter GA opsional dan fixedStudyIndices.
+Jalankan runGeneticAlgorithm dari gaScheduler.js.
+Kembalikan JSON berisi:
+bestIndividual (chromosome, fitness)
+stats (misal: bestFitnessPerGeneration)
+backend/src/server.js:
+Inisialisasi Express, middleware JSON, dan CORS (agar bisa diakses dari frontend).
+Gunakan router gaRoutes.
+Jalankan server pada port yang bisa dikonfigurasi (misalnya PORT = 4000).
+Tambahkan log singkat saat server start.
+package.json Backend
+
+Tambahkan dependency minimal:
+express, cors, dan jika perlu nodemon untuk dev script.
+Tambah script:
+"start": "node src/server.js"
+"dev": "nodemon src/server.js" (opsional, tapi sangat membantu).
+3. Frontend React – Spesifikasi
+Bootstrap Project
+
+Buat folder frontend dengan setup React modern (misalnya Vite + React).
+Pastikan frontend/package.json punya script:
+"dev", "build", "preview" (standar Vite) atau skrip setara jika pakai CRA.
+Struktur Komponen
+
+frontend/src/main.jsx atau index.jsx:
+Bootstrapping React dan render App.
+frontend/src/App.jsx:
+Layout utama (judul, deskripsi singkat aplikasi).
+Render GaConfigForm dan ScheduleViewer.
+Komponen Form Konfigurasi – frontend/src/components/GaConfigForm.jsx
+
+Form sederhana untuk mengatur:
+maxGenerations, populationSize, crossoverRate, mutationRate, dll.
+Input fixedStudyIndices (bisa text area atau input string yang nanti di-parse array).
+Tombol “Run GA”.
+Saat submit, panggil API backend POST /api/ga/run via helper di apiClient.js.
+Propagate hasil respon ke parent (App) melalui callback.
+Komponen Viewer Jadwal – frontend/src/components/ScheduleViewer.jsx
+
+Menerima bestIndividual dan/atau jadwal hasil GA sebagai prop.
+Tampilkan:
+Fitness terbaik.
+Visualisasi sederhana jadwal 7 hari (misalnya tabel hari vs slot, dengan warna berbeda untuk REST/WORK/STUDY_FIXED/NAP).
+Buat minimal cukup informatif; tidak perlu desain rumit, tapi struktur kode harus rapi dan mudah dikembangkan.
+API Client – frontend/src/services/apiClient.js
+
+Fungsi misalnya:
+runGa(config) → melakukan fetch ke http://localhost:4000/api/ga/run (atau gunakan import.meta.env untuk base URL).
+Tangani error dasar dan kembalikan JSON.
+4. Kualitas Kode & Penjelasan
+Gunakan ES6+ (import/export, arrow function, dsb.) secara konsisten (boleh CommonJS di backend jika lebih praktis, tapi konsisten).
+Tambahkan komentar singkat di bagian yang “penting”:
+Misalnya penjelasan singkat di gaScheduler.js tentang apa yang dilakukan tiap fungsi inti.
+Di salah satu file (misalnya backend/src/README-DEV.md atau komentar di server.js), jelaskan:
+Cara menjalankan backend: cd backend && npm install && npm run dev atau npm start.
+Cara menjalankan frontend: cd frontend && npm install && npm run dev.
+Aliran data: frontend mengirim konfigurasi → backend menjalankan GA → mengembalikan hasil → frontend menampilkan jadwal.
+5. Harapan Akhir
+Setelah prompt ini dijalankan, saya mengharapkan:
+Folder backend dan frontend sudah ada dengan file-file di atas terisi kode.
+Backend dapat dijalankan dan merespon endpoint POST /api/ga/run tanpa error.
+Frontend dapat di-run dan memanggil backend untuk menampilkan hasil GA secara sederhana.
+Jika ada asumsi yang meragukan, gunakan default yang masuk akal dan jelaskan singkat dalam komentar.
