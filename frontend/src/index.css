@@ -1,0 +1,113 @@
+/* ============================================================
+   Design Tokens & Global Reset
+   ============================================================ */
+:root {
+  --font-family: 'Inter', 'Segoe UI', sans-serif;
+
+  --color-primary:       #6366f1;
+  --color-primary-dark:  #4f46e5;
+  --color-primary-light: #eef2ff;
+  --color-primary-mid:   #c7d2fe;
+
+  --color-bg:            #f4f6fb;
+  --color-surface:       #ffffff;
+  --color-border:        #e2e5ef;
+  --color-border-soft:   #edf0f7;
+
+  --color-text:          #111827;
+  --color-text-secondary:#6b7280;
+  --color-text-tertiary: #9ca3af;
+
+  --color-success:       #10b981;
+  --color-success-bg:    #d1fae5;
+  --color-warning:       #f59e0b;
+  --color-warning-bg:    #fef9c3;
+  --color-error:         #ef4444;
+  --color-error-bg:      #fee2e2;
+  --color-info-bg:       #eff6ff;
+  --color-info-border:   #bfdbfe;
+  --color-info-text:     #1d4ed8;
+
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+  --radius-xl:  20px;
+  --radius-full: 9999px;
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.07), 0 2px 6px rgba(0,0,0,0.04);
+  --shadow-lg:  0 10px 30px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ============================================================
+   Utility classes
+   ============================================================ */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 1.25rem 1.5rem;
+}
+
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+/* Input reset */
+input[type='number'],
+input[type='time'],
+input[type='text'] {
+  font-family: var(--font-family);
+  font-size: 0.9rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.65rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+  transition: border-color 0.15s;
+  outline: none;
+}
+
+input[type='number']:focus,
+input[type='time']:focus,
+input[type='text']:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+}
+
+input:disabled {
+  background: #f3f4f6;
+  color: var(--color-text-tertiary);
+  cursor: not-allowed;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
