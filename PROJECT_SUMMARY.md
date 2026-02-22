@@ -1,75 +1,75 @@
-# Schedule GA App - Summary
+# Schedule GA App - Ringkasan
 
-## Overview
-A full-stack app that generates a weekly schedule using a Genetic Algorithm (GA) combined with a Two-Process Model (TPM) of fatigue. The goal is to balance work, study, sleep, power naps, and leisure across a 7-day week.
+## Gambaran Umum
+Aplikasi full-stack yang membuat jadwal mingguan menggunakan Genetic Algorithm (GA) yang dikombinasikan dengan Two-Process Model (TPM) untuk kelelahan. Tujuannya adalah menyeimbangkan kerja, kuliah, tidur, power nap, dan waktu luang dalam 7 hari.
 
-## Main Goals
-- Build a weekly schedule that is realistic and balanced.
-- Respect fixed study and work blocks.
-- Minimize fatigue while meeting minimum sleep needs.
-- Present results in a clear, visual schedule.
+## Tujuan Utama
+- Membuat jadwal mingguan yang realistis dan seimbang.
+- Menghormati blok kuliah dan kerja yang bersifat tetap.
+- Meminimalkan kelelahan sambil memenuhi kebutuhan tidur minimum.
+- Menampilkan hasil jadwal secara jelas dan visual.
 
-## Architecture
+## Arsitektur
 - Backend: Node.js + Express
 - Frontend: React + Vite
-- GA Engine: custom implementation (selection, crossover, mutation, elitism)
-- Fatigue Model: Two-Process Model (Process S and Process C)
+- Mesin GA: implementasi kustom (seleksi, crossover, mutasi, elitisme)
+- Model Kelelahan: Two-Process Model (Process S dan Process C)
 
-## Key Concepts
-### Time Representation
-- 7 days, 48 slots per day
-- 1 slot = 30 minutes
-- Total: 336 slots per week
+## Konsep Kunci
+### Representasi Waktu
+- 7 hari, 48 slot per hari
+- 1 slot = 30 menit
+- Total: 336 slot per minggu
 
-### Alleles (Activity Encoding)
+### Allele (Pengkodean Aktivitas)
 - 0 = LEISURE (Waktu Luang)
 - 1 = WORK (Kerja)
 - 2 = STUDY_FIXED (Kuliah wajib)
 - 3 = NAP (Power Nap)
 - 4 = SLEEP (Tidur)
 
-### Optimization Targets
-The GA optimizes a fitness score based on:
-- Fatigue level (Process S - Process C)
-- Study fixed-slot violations (heavy penalty)
-- Minimum daily sleep quota
-- Power nap rules (sleep inertia penalty for long naps)
+### Target Optimasi
+GA mengoptimalkan skor fitness berdasarkan:
+- Tingkat kelelahan (Process S - Process C)
+- Pelanggaran slot kuliah tetap (penalti besar)
+- Kuota tidur minimum harian
+- Aturan power nap (penalti sleep inertia untuk nap terlalu lama)
 
-## Backend Flow
-1. Client sends config to POST /api/ga/run
-2. Backend normalizes and validates input
-3. GA initializes population
-4. GA evolves population (selection, crossover, mutation)
-5. Fitness computed per chromosome
-6. Best chromosome returned along with stats
+## Alur Backend
+1. Client mengirim konfigurasi ke POST /api/ga/run
+2. Backend menormalkan dan memvalidasi input
+3. GA menginisialisasi populasi
+4. GA berevolusi (seleksi, crossover, mutasi)
+5. Fitness dihitung per kromosom
+6. Kromosom terbaik dikembalikan beserta statistik
 
-## Frontend Flow
-1. App loads schedule metadata from GET /api/ga/meta
-2. User selects preset or custom parameters
-3. User adds fixed study/work blocks
-4. User runs optimization
-5. Results are rendered:
-   - Summary cards
-   - Weekly Gantt chart
-   - Per-day detail list
-   - Summary table
+## Alur Frontend
+1. Aplikasi memuat metadata jadwal dari GET /api/ga/meta
+2. Pengguna memilih preset atau mengubah parameter
+3. Pengguna menambahkan blok kuliah/kerja tetap
+4. Pengguna menjalankan optimasi
+5. Hasil ditampilkan:
+   - Kartu ringkasan
+   - Gantt chart mingguan
+   - Detail per hari
+   - Tabel ringkasan
 
-## GA Pipeline
-- Initialization: random activity assignment except fixed slots
-- Selection: tournament selection
+## Pipeline GA
+- Inisialisasi: aktivitas acak kecuali slot tetap
+- Seleksi: tournament selection
 - Crossover: two-point
-- Mutation: swap-based
-- Elitism: top individuals preserved
-- Early stopping: stops when no improvement
+- Mutasi: swap
+- Elitisme: individu terbaik dipertahankan
+- Early stopping: berhenti saat tidak ada perbaikan
 
-## Sleep, Nap, and Leisure Rules
-- Minimum daily sleep: 10 slots (5 hours)
-- Power nap effective: 1-2 slots
-- Power nap 3-4 slots: penalized (sleep inertia)
-- Power nap >4 slots: treated as sleep
-- Leisure reduces fatigue lightly (0.3x sleep effect)
+## Aturan Tidur, Nap, dan Waktu Luang
+- Minimum tidur harian: 10 slot (5 jam)
+- Power nap efektif: 1-2 slot
+- Power nap 3-4 slot: diberi penalti (sleep inertia)
+- Power nap >4 slot: dianggap sebagai tidur
+- Waktu luang mengurangi kelelahan ringan (0.3x efek tidur)
 
-## Key Files
+## File Penting
 ### Backend
 - backend/src/server.js
 - backend/src/routes/gaRoutes.js
@@ -84,25 +84,45 @@ The GA optimizes a fitness score based on:
 - frontend/src/services/apiClient.js
 - frontend/src/config/scheduleConfig.js
 
-## API Endpoints
+## Endpoint API
 - GET /api/ga/meta
-  - Returns schedule topology and default config
+  - Mengembalikan topologi jadwal dan konfigurasi default
 - POST /api/ga/run
-  - Runs GA and returns best solution
+  - Menjalankan GA dan mengembalikan solusi terbaik
 
-## UI Highlights
-- Preset optimization modes (Cepat, Seimbang, Teliti)
-- Clear separation of sections
-- Visual weekly Gantt chart
-- Detailed per-day time blocks
-- Summary table with hours per activity
+## Highlight UI
+- Preset mode optimasi (Cepat, Seimbang, Teliti)
+- Pembagian section yang jelas
+- Gantt chart jadwal mingguan
+- Detail blok waktu per hari
+- Tabel ringkasan jam per aktivitas
 
-## Assumptions
-- Fixed study slots always override work slots.
-- Sleep is required daily; leisure cannot replace sleep.
-- Power nap rules are enforced by penalties.
+## Asumsi
+- Slot kuliah tetap selalu mengalahkan slot kerja.
+- Tidur wajib setiap hari; waktu luang tidak bisa menggantikan tidur.
+- Aturan power nap ditegakkan dengan penalti.
 
-## Notes
-- All time input is aligned to 30-minute slots.
-- Performance optimized by single-pass fitness evaluation.
-- UI is designed to be beginner-friendly and clear.
+## Saran Dasar Ilmu
+- Genetic Algorithm (GA): selection, crossover, mutation, elitism, dan tuning parameter.
+- Optimisasi Terbatas: hard vs soft constraints, penalti, dan solusi feasible.
+- Two-Process Model (TPM): Process S & C, sleep inertia, efektivitas nap.
+- Sleep Physiology & Chronobiology: ritme sirkadian dan drive tidur homeostatik.
+- Time-series Scheduling: representasi slot waktu, konflik jadwal, block scheduling.
+- Multi-objective Optimization: trade-off kelelahan, tidur minimum, produktivitas.
+- Human Factors / UX: penyajian jadwal agar mudah dipahami dan actionable.
+
+## Daftar Bacaan dan Kata Kunci
+- Genetic Algorithm: "genetic algorithm tournament selection", "two-point crossover", "mutation rate tuning", "elitism in GA".
+- Constraint Optimization: "hard constraints vs soft constraints", "penalty function optimization", "constraint satisfaction scheduling".
+- Two-Process Model: "Borbély two-process model", "Process S Process C sleep", "sleep inertia model".
+- Power Nap: "power nap 10-30 minutes", "nap duration cognitive performance", "sleep inertia after nap".
+- Chronobiology: "circadian rhythm phase", "homeostatic sleep drive", "chronotype effects".
+- Scheduling: "time slot scheduling", "weekly timetable optimization", "block scheduling algorithm".
+- Multi-objective: "Pareto optimization", "multi-objective genetic algorithm", "NSGA-II basics".
+- UX untuk Jadwal: "calendar UX patterns", "information visualization for schedules", "Gantt chart best practices".
+
+## Catatan
+- Semua input waktu diselaraskan ke slot 30 menit.
+- Performa dioptimalkan dengan evaluasi fitness satu lintasan.
+- UI dibuat ramah pemula dan mudah dipahami.
+
